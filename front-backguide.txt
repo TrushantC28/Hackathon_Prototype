@@ -1,0 +1,275 @@
+Perfect — I’ll give you a **clear, structured, agent-friendly guide** that your LLM can execute step-by-step without confusion.
+
+---
+
+# 🧠 OBJECTIVE
+
+Connect **Vercel frontend** → **Render backend API**
+
+Backend base URL:
+
+```text
+https://x12guard-backend.onrender.com
+```
+
+---
+
+# 📘 TASK BREAKDOWN (FOR LLM AGENT)
+
+---
+
+## 🔹 STEP 1 — Create Central API Config
+
+### 📁 File:
+
+```text
+frontend/src/config/api.js
+```
+
+### 📄 Content:
+
+```js
+export const BASE_URL = "https://x12guard-backend.onrender.com";
+```
+
+---
+
+## 🔹 STEP 2 — Locate API Usage Points
+
+### 🔍 Search across project:
+
+* `"localhost"`
+* `"5000"`
+* `"/api"`
+* `"fetch("`
+* `"axios"`
+
+### 🎯 Focus directories:
+
+```text
+src/services/
+src/utils/
+src/components/
+```
+
+---
+
+## 🔹 STEP 3 — Replace Local URLs
+
+### ❌ Replace:
+
+```js
+http://localhost:5000
+```
+
+### ✅ With:
+
+```js
+https://x12guard-backend.onrender.com
+```
+
+---
+
+## 🔹 STEP 4 — Standardize API Calls
+
+### Import config:
+
+```js
+import { BASE_URL } from "../config/api";
+```
+
+---
+
+### Convert API calls to:
+
+#### ✅ GET Example
+
+```js
+await fetch(`${BASE_URL}/api/health`);
+```
+
+---
+
+#### ✅ POST (File Upload — IMPORTANT FOR YOUR APP)
+
+```js
+const formData = new FormData();
+formData.append("file", file);
+
+const response = await fetch(`${BASE_URL}/api/parse`, {
+  method: "POST",
+  body: formData,
+});
+```
+
+---
+
+## 🔹 STEP 5 — Add Error Handling
+
+Wrap API calls:
+
+```js
+try {
+  const res = await fetch(`${BASE_URL}/api/parse`, {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+  return data;
+
+} catch (error) {
+  console.error("API Error:", error);
+  throw error;
+}
+```
+
+---
+
+## 🔹 STEP 6 — Handle Relative API Calls (IMPORTANT)
+
+### ❌ If found:
+
+```js
+fetch("/api/parse")
+```
+
+### ✅ Replace with:
+
+```js
+fetch(`${BASE_URL}/api/parse`)
+```
+
+---
+
+## 🔹 STEP 7 — Ensure Correct Headers (if JSON used)
+
+```js
+headers: {
+  "Content-Type": "application/json"
+}
+```
+
+⚠️ DO NOT add headers for `FormData`
+
+---
+
+## 🔹 STEP 8 — Verify Backend Routes
+
+Ensure frontend matches backend:
+
+| Frontend Call | Backend Route |
+| ------------- | ------------- |
+| `/api/parse`  | exists        |
+| `/api/health` | exists        |
+
+---
+
+## 🔹 STEP 9 — Rebuild & Deploy
+
+Run:
+
+```bash
+npm run build
+```
+
+Then:
+
+```bash
+git add .
+git commit -m "connect frontend to backend API"
+git push
+```
+
+---
+
+## 🔹 STEP 10 — Test Production
+
+Open deployed frontend (Vercel):
+
+Test:
+
+* File upload
+* API response
+
+---
+
+# ⚠️ EDGE CASE HANDLING
+
+---
+
+## 🔴 CORS Issue
+
+If error:
+
+```text
+Blocked by CORS
+```
+
+Backend fix:
+
+```js
+app.use(cors({
+  origin: "*"
+}));
+```
+
+---
+
+## 🟡 Slow First Request
+
+Render free tier:
+
+* First API call = delay (10–15 sec)
+
+---
+
+## 🔴 Network Error Still Occurs
+
+Check:
+
+* Wrong endpoint path
+* Missing `/api`
+* Incorrect method (GET vs POST)
+
+---
+
+# 🧠 EXPECTED FINAL STATE
+
+```text
+Frontend (Vercel)
+   ↓
+https://x12guard-backend.onrender.com/api/*
+   ↓
+Backend (Render)
+   ↓
+JSON Response
+```
+
+---
+
+# ✅ SUCCESS CRITERIA
+
+* No "Network error"
+* API returns valid response
+* File upload works
+* Data displayed in UI
+
+---
+
+# 💡 OPTIONAL (ADVANCED)
+
+Use environment variable instead:
+
+```js
+export const BASE_URL = import.meta.env.VITE_API_URL;
+```
+
+And in Vercel:
+
+```text
+VITE_API_URL=https://x12guard-backend.onrender.com
+```
+
+---
+
