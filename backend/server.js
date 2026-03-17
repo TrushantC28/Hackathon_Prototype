@@ -3,11 +3,11 @@
  * Express server with file upload support and EDI processing routes.
  */
 
-import cors from "cors";
+// import cors from "cors";
 
-app.use(cors({
-  origin: "*"
-}));
+// app.use(cors({
+//   origin: "*"
+// }));
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
